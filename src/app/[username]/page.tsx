@@ -1,6 +1,10 @@
 'use client'
 
 import { useEffect, useState, ReactNode } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { setTags } from "../../store/tagSlice";
+import { useRouter } from 'next/navigation';
 
 export default function UserPage({ params }: { params: { username: string } }) {
     type Artist = {
@@ -14,8 +18,11 @@ export default function UserPage({ params }: { params: { username: string } }) {
         artists: string[]
     }
 
-    const [tags, setTags] = useState<Tag[]>([])
+    const dispatch = useDispatch();
+    const router = useRouter();
+  
     const [iterationCount, setIterationCount] = useState(0)
+    const tags = useSelector((state: RootState) => state.tags.tags);
 
     const { username } = params;
     
@@ -26,7 +33,7 @@ export default function UserPage({ params }: { params: { username: string } }) {
         try {
             const artistResponse = await fetch(
                 `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${username}&api_key=db71a72bd8840bf1b346579cc1ed4e71&format=json&limit=300&period=7day` // overall | 7day | 1month | 3month | 6month | 12month
-            );
+            ); 
             const artistData = await artistResponse.json();
             
             for (let i = 0; i < artistData.topartists.artist.length; i++) {
@@ -70,7 +77,7 @@ export default function UserPage({ params }: { params: { username: string } }) {
             
             console.log(tags)
 
-            setTags(Object.values(tagList).sort((a, b) => b.count - a.count))
+            dispatch(setTags(Object.values(tagList).sort((a, b) => b.count - a.count))); 
             setIterationCount(countIterations)
             
         } catch (error) {
@@ -89,7 +96,7 @@ export default function UserPage({ params }: { params: { username: string } }) {
             <div className="tags-div">
                 <span>{iterationCount} artists.</span>        
                 { tags.map((tag: Tag): ReactNode => (
-                    <div key={tag.name} className="tag-div">
+                    <div key={tag.name} className="tag-div" onClick={() => {router.push(`/${username}/${tag.name}`);                }}>
                         <h3>{tag.name}</h3>
                         <span>{tag.count}</span>
                     </div>

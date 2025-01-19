@@ -1,15 +1,15 @@
+'use client';
+
 import { Poppins } from 'next/font/google';
+import './styles/main.scss';
+import { Provider } from 'react-redux';
+import { store } from '../store/store';
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '600', '700'], // Choose the weights you need
-  variable: '--font-poppins',   // Define a custom CSS variable
+  weight: ['400', '600', '700'],
+  variable: '--font-poppins',
 });
-
-export const metadata = {
-  title: 'My App',
-  description: 'Find and display the most listened tags for a Last.fm user.',
-};
 
 export default function RootLayout({
   children,
@@ -18,7 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={poppins.variable}>
-      <body>{children}</body>
+      <body>
+        <Provider store={store}>{children}</Provider>
+      </body>
     </html>
   );
 }

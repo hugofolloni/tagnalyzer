@@ -1,0 +1,74 @@
+// Variables
+$background-color: #121212;
+$text-color: #ffffff;
+$button-bg: #3498db;
+$button-hover-bg: darken($button-bg, 10%);
+$input-border-color: lighten($button-bg, 20%);
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-poppins), sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: #ffffff;
+  }
+
+.container {
+  background-color: $background-color;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $text-color;
+}
+
+
+.box {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 300px;
+
+  h1 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid $input-border-color;
+    border-radius: 5px;
+    background-color: transparent;
+    color: $text-color;
+    outline: none;
+
+    &:focus {
+      border-color: $button-bg;
+    }
+  }
+
+  button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: $button-bg;
+    color: $text-color;
+    font-weight: bold;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $button-hover-bg;
+    }
+  }
+}

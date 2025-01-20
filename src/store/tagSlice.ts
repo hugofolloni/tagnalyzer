@@ -1,10 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Album } from "../models/tag"
 
 export interface TagState {
   tags: {
     name: string;
     count: number;
     artists: string[];
+    albums: Album[];
   }[];
 }
 

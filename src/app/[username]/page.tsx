@@ -5,20 +5,29 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { setTags } from "../../store/tagSlice";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Tag, Artist, Album } from '../../models/tag'
+import { Tag, Artist, Album, UserInfo } from '../../models/tag'
+import Image from 'next/image';
+import { SpotifyApi } from "@spotify/web-api-ts-sdk";
+
 
 export default function UserPage({ params }: { params: { username: string } }) {
-
 
     const dispatch = useDispatch();
     const router = useRouter();
   
-    const [iterationCount, setIterationCount] = useState(0)
     const tags = useSelector((state: RootState) => state.tags.tags);
 
     const searchParams = useSearchParams();
     const timeRange = searchParams.get("timeRange") || "overall";
     const { username } = params;
+    const [userInfo, setUserInfo] = useState<UserInfo>()
+
+    const getUserInfos = async () => {
+        const userResponse = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${username}&api_key=db71a72bd8840bf1b346579cc1ed4e71&format=json`)
+        const userData = await userResponse.json();
+
+        setUserInfo({username: userData.user.name, photo: userData.user.image[3]["#text"]});
+    }
     
     const getArtistTags = async () => {
         const artistList: Artist[] = [];
@@ -60,7 +69,6 @@ export default function UserPage({ params }: { params: { username: string } }) {
                             }
                         });
                         countIterations++;
-                        return tags;
                     })
                     .catch(error => {
                         console.error(`Error fetching tags for ${artist}:`, error);
@@ -72,7 +80,10 @@ export default function UserPage({ params }: { params: { username: string } }) {
             
             const tagsResponse = Object.values(tagList).sort((a, b) => b.count - a.count);
 
-            setIterationCount(countIterations);
+            console.log(artistList)
+            getArtistInfos(artistList.slice(0, 3), tagsResponse[0].artists.slice(0, 3))
+            console.log(`Analyzed top ${countIterations} artists for that period`)
+
             getTopAlbumsPerTag(tagsResponse);            
         } catch (error) {
             console.error("Main error:", error);
@@ -101,21 +112,77 @@ export default function UserPage({ params }: { params: { username: string } }) {
 
     }
     
+    const getArtistInfos = async (artists: Artist[], mainTagArtists: string[]) => {
+        type ArtistInfoResponse = {
+            tag: {
+                photo: string,
+                name: string
+            } | null, 
+            artist: {
+                photo: string,
+                name: string
+            } | null,
+        }
+
+        const artistList: string[] = []
+        const tagArtistList: string[] = []
+
+        for(let i = 0; i < artists.length; i++){
+            artistList.push(artists[i].name);
+        }
+
+        for(let i = 0; i < mainTagArtists.length; i++){
+            tagArtistList.push(mainTagArtists[i])
+        }
+
+        console.log(artistList, tagArtistList)
+
+        const response: ArtistInfoResponse = {tag: null, artist: null}
+
+        const api = SpotifyApi.withClientCredentials(
+            process.env.NEXT_PUBLIC_SPOTIFY_CLIENT!,
+            process.env.NEXT_PUBLIC_SPOTIFY_SECRET!
+        );
+
+        const items = await api.search(`${artistList.join(`,`)},${tagArtistList.join(`,`)}`, ["artist"]);
+
+        console.log(items.artists)
+        for(let i = 0; i < items.artists.items.length; i++){
+            const item = items.artists.items[i];
+            if((artistList.indexOf(item.name) !== -1 && !response.artist) || (response.artist && artistList.indexOf(item.name) < artistList.indexOf(response.artist.name))){
+                response.artist = {photo: item.images[0].url, name: item.name}
+            }
+
+            if((tagArtistList.indexOf(item.name) !== -1 && !response.tag) || (response.tag && tagArtistList.indexOf(item.name) < tagArtistList.indexOf(response.tag.name))){
+                response.tag = {photo: item.images[0].url, name: item.name}
+            }
+
+            if(response.tag && response.artist){
+                break
+            }
+
+        }
+
+        console.log(response)
+    }
+    
     useEffect(() => {
         getArtistTags();
+        getUserInfos();
     }, [])
 
 
     return (
       <div className="user-wrapper">
-        {(tags.length > 0 && (
+        {(tags.length > 0 && userInfo && (
             <div className="tags-div">
-                <span>{iterationCount} artists.</span>        
-                <p>Selected Time Range: {timeRange}</p>
+                <Image src={userInfo.photo} alt="" width={256} height={256} />
+                <h2>{userInfo.username}</h2>
+                <p>{timeRange === "overall" ? "All time" : `Last ${timeRange}`}</p>
+                <h2>Most listened tags</h2>
                 { tags.map((tag: Tag): ReactNode => (
                     <div key={tag.name} className="tag-div" onClick={() => { router.push(`/${username}/${tag.name}?timeRange=${timeRange}`) }}>
                         <h3>{tag.name}</h3>
-                        <span>{tag.count}</span>
                     </div>
                 ))}
             </div>

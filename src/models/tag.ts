@@ -16,3 +16,8 @@ export type Album = {
     artist: string, 
     image: string
 }
+
+export type UserInfo = {
+  username: string,
+  photo: string,
+}

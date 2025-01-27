@@ -1,13 +1,17 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import './styles/main.scss';
+import { useDispatch } from "react-redux";
+import { setTags } from "../store/tagSlice";
+
 
 export default function HomePage() {
   const [username, setUsername] = useState('');
   const [timeRange, setTimeRange] = useState("overall");
 
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const handleSubmit = () => {
     if (username.trim()) {
@@ -17,6 +21,14 @@ export default function HomePage() {
       alert("Please enter a valid username.");
     }
   };
+
+  const resetTags = () => {
+    dispatch(setTags([]));
+  }
+  
+  useEffect(() => {
+    resetTags()
+  })
 
   return (
     <div className="container">

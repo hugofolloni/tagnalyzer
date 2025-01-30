@@ -1,9 +1,48 @@
-// Variables
-$background-color: #121212;
-$text-color: #ffffff;
-$button-bg: #3498db;
-$button-hover-bg: darken($button-bg, 10%);
-$input-border-color: lighten($button-bg, 20%);
+$background-color: #121212;  // Dark main background  
+$text-color: #ffffff;        // White text  
+$primary-color: #D51007;     // Last.fm red  
+$dark-primary: darken($primary-color, 10%);  
+$light-primary: lighten($primary-color, 20%);  
+$dark-gradient: #000000;      // Deep black for contrast  
+
+// New Extracted Colors
+$salmon: #FFB6C1;      // Soft pinkish red (used in the header)
+$purple-card: #A56EFF; // Purple for artist stats  
+$green-card: #50F0B5;  // Green for album stats  
+$blue-card: #4285F4;   // Blue for track stats  
+
+// Supporting Colors
+$border-color: #303030;  
+$muted-text: #B3B3B3;  
+$card-background: #181818;  
+$link-color: #FF5A5F;         // Soft red for links and interactive elements  
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin underline-create {
+  content: '';
+  position: absolute;
+  height: 1px;
+  width: 50%;
+  bottom: 7px;
+  left: 0;
+}
+
+@mixin button {
+  background-color: $primary-color; 
+  width: 120px;
+  height: 50px;
+  border-radius: 6px;
+}
 
 * {
     margin: 0;
@@ -12,63 +51,188 @@ $input-border-color: lighten($button-bg, 20%);
 }
 
 body {
-    font-family: var(--font-poppins), sans-serif;
+    font-family: var(--font-inter), sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #121212;
+    background: $dark-gradient no-repeat;
     color: #ffffff;
-  }
+    min-height: 100vh;
+    overflow-x: hidden;
+}
 
-.container {
-  background-color: $background-color;
-  height: 100vh;
+.header {
+  width: 100vw;
+  height: 180px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  color: $text-color;
-}
+  padding-left: 15%;
 
-
-.box {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  width: 300px;
-
-  h1 {
-    margin-bottom: 20px;
-    font-size: 1.5rem;
-  }
-
-  input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid $input-border-color;
-    border-radius: 5px;
-    background-color: transparent;
+  .title {
+    position: relative;
+    font-size: 72px;
     color: $text-color;
-    outline: none;
 
-    &:focus {
-      border-color: $button-bg;
+    &:after{
+      content: 'tagnalyzer';
+      cursor: cell;
+      position: absolute;
+      top: -2px;
+      left: 2px;
+      color: $primary-color;
+      z-index: 1;
+      transition: 0.2s ease-in-out all;
     }
-  }
 
-  button {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: $button-bg;
-    color: $text-color;
-    font-weight: bold;
-    cursor: pointer;
-
-    &:hover {
-      background-color: $button-hover-bg;
+    &:hover:after {
+      top: -4px;
+      left: 4px;
     }
   }
 }
+
+.home-wrapper{
+  width: 100vw;
+  height: calc(100vh - 180px);
+  padding: 7% 15%;
+  
+  .title-div {
+    @include flex-column();
+    
+    span {
+      font-size: 64px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: -3px;
+      text-decoration: underline $text-color;
+    }
+  }
+
+  .subtitle-div {
+    margin-top: 3%;
+    @include flex-column();
+    
+    span {
+      font-size: 21px;
+    }
+  }
+
+  .input-div {
+    width: 100;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 5%;
+    align-items: center;
+
+    input {
+      width: 50%;
+      border: none;
+      background: transparent;
+      color: white;
+      padding: 15px 10px;
+      font-size: 16px;
+      height: 50px;
+      margin-top: 20px;
+      outline: none;
+      
+      &:focus {
+        & ~ .underline::after {
+          transform: scaleX(1);
+        }
+      }   
+    }
+    
+    .underline {
+      &:before {
+        @include underline-create();
+        background: $text-color;
+      }
+    
+      &:after {
+        @include underline-create();
+        background: $primary-color;
+        transform: scaleX(0);
+        transition: all 0.3s ease-in-out;
+        transform-origin: left;
+      }
+    }
+
+    select {
+      width: 20%;
+      border: none;
+      background: transparent;
+      color: $text-color;
+      padding: 15px 3px;
+      font-size: 16px;
+      height: 50px;
+      margin-top: 20px;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+      appearance: none; 
+
+      option {
+        background: $card-background;
+        color: $text-color;
+        padding: 10px;
+        
+        &:hover {
+          background: $dark-primary;
+        }
+      }
+  
+      &:focus {
+        & ~ .select-underline::after {
+          transform: scaleX(1);
+        }
+      }
+    }
+  
+    .select-underline {
+      &:before {
+        @include underline-create();
+        margin-left: calc(59%);
+        width: 20%;
+        background: $text-color;
+      }
+    
+      &:after {
+        @include underline-create();
+        margin-left: calc(59%);
+        width: 20%;
+        background: $primary-color;
+        transform: scaleX(0);
+        transition: all 0.3s ease-in-out;
+        transform-origin: right;
+      } 
+    }
+
+    .search-button {
+      @include button();
+      @include flex-center();
+      color: white;
+      padding: 7px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s ease;
+      margin-top: 20px;
+ 
+     &:hover{
+      background-color: $text-color;
+      transform: translate(5px, -5px);
+      color: $primary-color;
+    }
+  }
+
+    .search-button-background {
+      @include button();
+      position: absolute;
+      z-index: -1;
+      top: 20px;
+      right: 0;
+    }
+  }
+}
+

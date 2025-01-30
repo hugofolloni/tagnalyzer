@@ -128,11 +128,11 @@ export default function UserPage({ params }: { params: { username: string } }) {
         const tagArtistList: string[] = []
 
         for(let i = 0; i < artists.length; i++){
-            artistList.push(artists[i].name);
+            artistList.push(artists[i].name.toLowerCase());
         }
 
         for(let i = 0; i < mainTagArtists.length; i++){
-            tagArtistList.push(mainTagArtists[i])
+            tagArtistList.push(mainTagArtists[i].toLowerCase())
         }
 
         console.log(artistList, tagArtistList)
@@ -149,21 +149,14 @@ export default function UserPage({ params }: { params: { username: string } }) {
         console.log(items.artists)
         for(let i = 0; i < items.artists.items.length; i++){
             const item = items.artists.items[i];
-            if((artistList.indexOf(item.name) !== -1 && !response.artist) || (response.artist && artistList.indexOf(item.name) < artistList.indexOf(response.artist.name))){
+            if((artistList.indexOf(item.name.toLowerCase()) !== -1 && !response.artist) || (response.artist && artistList.indexOf(item.name.toLowerCase()) < artistList.indexOf(response.artist.name.toLowerCase()))){
                 response.artist = {photo: item.images[0].url, name: item.name}
             }
 
-            if((tagArtistList.indexOf(item.name) !== -1 && !response.tag) || (response.tag && tagArtistList.indexOf(item.name) < tagArtistList.indexOf(response.tag.name))){
+            if((tagArtistList.indexOf(item.name.toLowerCase()) !== -1 && !response.tag) || (response.tag && tagArtistList.indexOf(item.name.toLowerCase()) < tagArtistList.indexOf(response.tag.name.toLowerCase()))){
                 response.tag = {photo: item.images[0].url, name: item.name}
             }
-
-            if(response.tag && response.artist){
-                break
-            }
-
         }
-
-        console.log(response)
     }
     
     useEffect(() => {

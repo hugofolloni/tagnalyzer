@@ -1,4 +1,4 @@
 export const metadata = {
-    title: 'My App',
+    title: 'Tagnalyzer',
     description: 'Find and display the most listened tags for a Last.fm user.',
   };

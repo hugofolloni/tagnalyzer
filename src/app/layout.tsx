@@ -1,14 +1,15 @@
 'use client';
 
-import { Poppins } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import './styles/main.scss';
 import { Provider } from 'react-redux';
 import { store } from '../store/store';
+import Header from './header';
 
-const poppins = Poppins({
+const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '600', '700'],
-  variable: '--font-poppins',
+  variable: '--font-inter',
 });
 
 export default function RootLayout({
@@ -17,9 +18,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={poppins.variable}>
+    <html lang="en" className={inter.variable}>
       <body>
-        <Provider store={store}>{children}</Provider>
+        <Provider store={store}>
+          <Header/>
+          {children}
+          </Provider>
       </body>
     </html>
   );

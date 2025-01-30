@@ -1,21 +1,18 @@
-$background-color: #121212;  // Dark main background  
-$text-color: #ffffff;        // White text  
+$black: #121212;  // Dark main background  
+$white: #ffffff;        // White text  
 $primary-color: #D51007;     // Last.fm red  
 $dark-primary: darken($primary-color, 10%);  
 $light-primary: lighten($primary-color, 20%);  
 $dark-gradient: #000000;      // Deep black for contrast  
 
 // New Extracted Colors
-$salmon: #FFB6C1;      // Soft pinkish red (used in the header)
+$salmon: #FFCACE;      // Soft pinkish red (used in the header)
 $purple-card: #A56EFF; // Purple for artist stats  
 $green-card: #50F0B5;  // Green for album stats  
 $blue-card: #4285F4;   // Blue for track stats  
-
-// Supporting Colors
-$border-color: #303030;  
-$muted-text: #B3B3B3;  
+       // Soft red for links and interactive elements  
 $card-background: #181818;  
-$link-color: #FF5A5F;         // Soft red for links and interactive elements  
+      // Soft red for links and interactive elements  
 
 @mixin flex-center {
   display: flex;
@@ -44,6 +41,20 @@ $link-color: #FF5A5F;         // Soft red for links and interactive elements
   border-radius: 6px;
 }
 
+@mixin wrappers {
+  width: 100vw;
+  padding: 7% 15%;
+}
+
+@mixin clipping {
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+}
+
+@mixin text-decorate {
+  text-transform: uppercase;
+  text-decoration: underline;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -51,13 +62,20 @@ $link-color: #FF5A5F;         // Soft red for links and interactive elements
 }
 
 body {
-    font-family: var(--font-inter), sans-serif;
+    font-family: var(--font-barlow), sans-serif;
     margin: 0;
     padding: 0;
     background: $dark-gradient no-repeat;
-    color: #ffffff;
+    color: $white;
     min-height: 100vh;
     overflow-x: hidden;
+}
+
+h3, a {
+  text-decoration: none;
+  color: $white;
+  font-weight: 700;
+  font-size: 18px;
 }
 
 .header {
@@ -70,7 +88,7 @@ body {
   .title {
     position: relative;
     font-size: 72px;
-    color: $text-color;
+    color: $white;
 
     &:after{
       content: 'tagnalyzer';
@@ -91,19 +109,18 @@ body {
 }
 
 .home-wrapper{
-  width: 100vw;
+  @include wrappers();
   height: calc(100vh - 180px);
-  padding: 7% 15%;
+  position: relative;
   
   .title-div {
     @include flex-column();
     
     span {
+      @include text-decorate();
       font-size: 64px;
       font-weight: 700;
-      text-transform: uppercase;
       letter-spacing: -3px;
-      text-decoration: underline $text-color;
     }
   }
 
@@ -146,7 +163,7 @@ body {
     .underline {
       &:before {
         @include underline-create();
-        background: $text-color;
+        background: $white;
       }
     
       &:after {
@@ -162,7 +179,7 @@ body {
       width: 20%;
       border: none;
       background: transparent;
-      color: $text-color;
+      color: $white;
       padding: 15px 3px;
       font-size: 16px;
       height: 50px;
@@ -174,7 +191,7 @@ body {
 
       option {
         background: $card-background;
-        color: $text-color;
+        color: $white;
         padding: 10px;
         
         &:hover {
@@ -192,14 +209,14 @@ body {
     .select-underline {
       &:before {
         @include underline-create();
-        margin-left: calc(59%);
+        margin-left: calc(57%);
         width: 20%;
-        background: $text-color;
+        background: $white;
       }
     
       &:after {
         @include underline-create();
-        margin-left: calc(59%);
+        margin-left: calc(57%);
         width: 20%;
         background: $primary-color;
         transform: scaleX(0);
@@ -220,7 +237,7 @@ body {
       margin-top: 20px;
  
      &:hover{
-      background-color: $text-color;
+      background-color: $white;
       transform: translate(5px, -5px);
       color: $primary-color;
     }
@@ -234,5 +251,166 @@ body {
       right: 0;
     }
   }
+
+  .logo {
+    position: absolute;
+    top: 0%;
+    right: 20%;
+    height: 40vh;
+    width: 40vh;
+  }
 }
 
+.user-wrapper {
+  @include wrappers();
+  padding-top: 0%;
+
+  .loading-div{
+    @include flex-center();
+  }
+
+  .tags-div {
+    @include flex-column(); 
+
+    .user-profile {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      background-color: $salmon;
+      color: $card-background;
+      width: 100vw;
+      margin-left: -20%;
+      padding: calc(5% + 40px) 20% 5% 20%;
+      position: relative;
+      
+      .report-headline-border {
+        background: url('https://www.last.fm/static/images/listening-report/v3/bg-lines.73682e46b8be.svg');
+        height: 40px;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 100%;
+      }
+
+      .profile-pic {
+        border-radius: 50%;
+        width: 180px;
+        height: 180px;
+        margin-right: 5%;
+      }
+      
+      .user-texts {
+        @include flex-column();
+
+        h2 {
+          font-weight: 700;
+          font-size: 72px;
+          line-height: 100px;
+        }
+
+        span {
+          font-weight: 600;
+          font-family: 45px;
+          line-height: 25px;
+        }
+      }
+    }
+
+    .most-listened-div {
+      display: flex;
+      flex-direction: row;
+      margin-top: 5%;
+      justify-content: space-between;
+
+      h2 {
+        @include text-decorate();
+        margin-bottom: 20px;
+      }
+
+      .tags, .artists {
+        width: 45%;
+    
+        .main-tag, .main-artist {
+          @include flex-column();
+          width: 100%;
+          aspect-ratio: 1 / 1;
+          overflow: hidden;
+          position: relative;
+          align-items: flex-start;
+          justify-content: flex-end;
+          margin-bottom: 10px;
+          transition: 0.3s ease all;
+          cursor: pointer;
+          &:hover {
+            transform: scale(1.01);
+          }
+
+          h3 {
+            display: flex;
+            align-items: center;
+            z-index: 2;
+            font-size: 32px;
+            padding: 40px;
+            width: 100%;
+            height: 100px;
+            text-decoration: none;
+            color: $white;
+            font-weight: 700;
+          }
+          
+          .main-tag-img, .main-artist-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            position: absolute;
+            z-index: 0;
+          }
+
+          .shadow {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            position: absolute;
+            z-index: 1;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 1) 100%);
+          }
+
+          .identifier {
+            @include flex-center();
+            width: 100px;
+            height: 40px;
+            position: absolute;
+            bottom: 10vh;
+            left: 5%;
+            background-color: $purple-card;
+            color: $black;
+            z-index: 2;
+            font-size: 18px;
+            font-weight: 600;
+          }
+
+          .main-tag {
+            position: absolute;
+            z-index: 2;
+            bottom: 3vh;
+            left: 80%;
+          }
+        }
+
+        .tag-div {
+          @include clipping();
+          width: 100%;
+          padding: 30px;
+          margin-bottom: 5px;
+          background-color: $card-background;
+          transition: 0.3s ease all;
+          cursor: pointer;
+          &:hover {
+            transform: scale(1.03);
+          }
+        }
+      }  
+    }
+  }
+}

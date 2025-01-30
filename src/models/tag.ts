@@ -21,3 +21,14 @@ export type UserInfo = {
   username: string,
   photo: string,
 }
+
+export type ArtistInfoResponse = {
+  tag: {
+      photo: string,
+      name: string
+  } | null, 
+  artist: {
+      photo: string,
+      name: string
+  } | null,
+}

@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation';
 import './styles/main.scss';
 import { useDispatch } from "react-redux";
 import { setTags } from "../store/tagSlice";
-
+import Image from 'next/image';
+import { setArtists } from '@/store/artistSlice';
 
 export default function HomePage() {
   const [username, setUsername] = useState('');
@@ -24,6 +25,7 @@ export default function HomePage() {
 
   const resetTags = () => {
     dispatch(setTags([]));
+    dispatch(setArtists([]));
   }
   
   useEffect(() => {
@@ -33,12 +35,12 @@ export default function HomePage() {
   return (
     <div className="home-wrapper">
         <div className="title-div">
-          <span>Find what you love</span>
+          <span>what you love</span>
           <span>in what you like</span>
         </div>
         <div className="subtitle-div">
           <span>Learn about the tags you most listen on Last.fm.</span>
-          <span>hich artists, albums and songs make your love that kind of music.</span>
+          <span>Which artists, albums and songs make you love that kind of music.</span>
         </div>
         <div className="input-div">
           <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
@@ -52,9 +54,10 @@ export default function HomePage() {
             <option value="12month">12 Months</option>
           </select>
           <div className='select-underline' />
-          <div className='search-button' onClick={() => handleSubmit()}>Search</div>
+          <div className='search-button' onClick={() => handleSubmit()}>Discover</div>
           <div className="search-button-background" />
         </div>
+        <Image  src="/cat.png" alt="logo" className="logo" width={1000} height={1000}/>
     </div>
   );
 }

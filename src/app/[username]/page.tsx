@@ -3,25 +3,29 @@
 import { useEffect, useState, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { setTags } from "../../store/tagSlice";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Tag, Artist, Album, UserInfo } from '../../models/tag'
+import { Tag, Artist, Album, UserInfo, ArtistInfoResponse } from '../../models/tag'
 import Image from 'next/image';
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
+import { setTags } from "../../store/tagSlice";
+import { setArtists } from "@/store/artistSlice";
+import { setImages } from "@/store/imageSlice";
 
 
 export default function UserPage({ params }: { params: { username: string } }) {
-
     const dispatch = useDispatch();
     const router = useRouter();
   
     const tags = useSelector((state: RootState) => state.tags.tags);
+    const artists = useSelector((state: RootState) => state.artists.artists);
+    const images = useSelector((state: RootState) => state.images.images)
 
     const searchParams = useSearchParams();
     const timeRange = searchParams.get("timeRange") || "overall";
     const { username } = params;
     const [userInfo, setUserInfo] = useState<UserInfo>()
-
+    const [iterations, setIterations] = useState<number>();
+    
     const getUserInfos = async () => {
         const userResponse = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${username}&api_key=db71a72bd8840bf1b346579cc1ed4e71&format=json`)
         const userData = await userResponse.json();
@@ -79,12 +83,13 @@ export default function UserPage({ params }: { params: { username: string } }) {
             await Promise.all(tagPromises);
             
             const tagsResponse = Object.values(tagList).sort((a, b) => b.count - a.count);
-
-            console.log(artistList)
+            
             getArtistInfos(artistList.slice(0, 3), tagsResponse[0].artists.slice(0, 3))
-            console.log(`Analyzed top ${countIterations} artists for that period`)
-
+            console.log(tagsResponse)
+            
+            setIterations(countIterations);
             getTopAlbumsPerTag(tagsResponse);            
+            dispatch(setArtists(artistList)); 
         } catch (error) {
             console.error("Main error:", error);
         }
@@ -113,29 +118,14 @@ export default function UserPage({ params }: { params: { username: string } }) {
     }
     
     const getArtistInfos = async (artists: Artist[], mainTagArtists: string[]) => {
-        type ArtistInfoResponse = {
-            tag: {
-                photo: string,
-                name: string
-            } | null, 
-            artist: {
-                photo: string,
-                name: string
-            } | null,
-        }
 
-        const artistList: string[] = []
+        const artistList: string[] = [artists[0].name]
         const tagArtistList: string[] = []
-
-        for(let i = 0; i < artists.length; i++){
-            artistList.push(artists[i].name.toLowerCase());
-        }
 
         for(let i = 0; i < mainTagArtists.length; i++){
             tagArtistList.push(mainTagArtists[i].toLowerCase())
         }
-
-        console.log(artistList, tagArtistList)
+        console.log(tagArtistList, artistList)
 
         const response: ArtistInfoResponse = {tag: null, artist: null}
 
@@ -145,18 +135,29 @@ export default function UserPage({ params }: { params: { username: string } }) {
         );
 
         const items = await api.search(`${artistList.join(`,`)},${tagArtistList.join(`,`)}`, ["artist"]);
+        console.log(items)
 
-        console.log(items.artists)
         for(let i = 0; i < items.artists.items.length; i++){
             const item = items.artists.items[i];
-            if((artistList.indexOf(item.name.toLowerCase()) !== -1 && !response.artist) || (response.artist && artistList.indexOf(item.name.toLowerCase()) < artistList.indexOf(response.artist.name.toLowerCase()))){
+            if(item.name.toLowerCase() === artists[0].name.toLowerCase()){
                 response.artist = {photo: item.images[0].url, name: item.name}
             }
 
-            if((tagArtistList.indexOf(item.name.toLowerCase()) !== -1 && !response.tag) || (response.tag && tagArtistList.indexOf(item.name.toLowerCase()) < tagArtistList.indexOf(response.tag.name.toLowerCase()))){
+            if((tagArtistList.indexOf(item.name.toLowerCase()) !== -1 && !response.tag) || (response.tag && tagArtistList.indexOf(item.name.toLowerCase()) !== -1 && tagArtistList.indexOf(item.name.toLowerCase()) < tagArtistList.indexOf(response.tag.name.toLowerCase()))){
                 response.tag = {photo: item.images[0].url, name: item.name}
             }
         }
+        if(!response.artist){
+            response.artist = {photo: 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png', name: artists[0].name}
+        }
+
+        if(!response.tag){
+            response.tag = {photo: 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png', name: mainTagArtists[0]}
+        }
+
+
+        console.log(response)
+        dispatch(setImages(response))
     }
     
     useEffect(() => {
@@ -164,22 +165,78 @@ export default function UserPage({ params }: { params: { username: string } }) {
         getUserInfos();
     }, [])
 
+    const timeLabels = {
+        'overall': "All time",
+        '7day': 'Last 7 days',
+        '1month': 'Last month',
+        '3month': 'Last 3 months',
+        '6month': 'Last 6 months',
+        '12month': 'Last year'
+    }
+
 
     return (
       <div className="user-wrapper">
         {(tags.length > 0 && userInfo && (
             <div className="tags-div">
-                <Image src={userInfo.photo} alt="" width={256} height={256} />
-                <h2>{userInfo.username}</h2>
-                <p>{timeRange === "overall" ? "All time" : `Last ${timeRange}`}</p>
-                <h2>Most listened tags</h2>
-                { tags.map((tag: Tag): ReactNode => (
-                    <div key={tag.name} className="tag-div" onClick={() => { router.push(`/${username}/${tag.name}?timeRange=${timeRange}`) }}>
-                        <h3>{tag.name}</h3>
+                <div className="user-profile">
+                    <div className="report-headline-border"/>
+                    <Image src={userInfo.photo} className="profile-pic" alt='Profile pic' width={1000} height={1000} />
+                    <div className="user-texts">
+                        <h2>{userInfo.username}</h2>
+                        <span>{timeLabels[timeRange as keyof typeof timeLabels]}</span>
+                        {iterations && <span>{iterations} most listened artists</span>}
                     </div>
-                ))}
+                </div>
+                <div className="most-listened-div">
+                    <div className="tags">
+                        <h2>Most listened tags</h2>
+
+                        {images && images.tag && (
+                            <div className="main-tag" onClick={() => { router.push(`/${username}/${tags[0].name}?timeRange=${timeRange}`) }}>
+                                <Image src={images.tag.photo} className='main-tag-img' alt='main tag image' width={1000} height={1000}/>
+                                <div className="shadow"/>
+                                <h3>{tags[0].name}</h3>
+                                <span className="identifier" style={{backgroundColor: "#469DF8"}}>Top tag</span>
+                            </div>
+                        )}
+
+                        { tags.slice(1, Math.min(50, tags.length)).map((tag: Tag): ReactNode => (
+                            <div key={tag.name} className="tag-div" onClick={() => { router.push(`/${username}/${tag.name}?timeRange=${timeRange}`) }}>
+                                <h3>{tag.name}</h3>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="artists">
+                        <h2>Most listened artists</h2>
+
+                        {images && images.artist && (
+                            <a href={`https://www.last.fm/music/${artists[0].name.split(" ").join("+")}`}>
+                                <div className="main-artist">
+                                    <Image src={images.artist.photo} className='main-artist-img' alt='main tag image' width={1000} height={1000}/>
+                                    <div className="shadow"/>
+                                    <h3>{artists[0].name}</h3>
+                                    <span className="identifier">Top artist</span>
+                                    <span className="main-tag">{artists[0].tags[0]}</span>
+                                </div>                            
+                            </a>
+                        )}
+
+                        { artists.slice(1, Math.min(50, artists.length)).map((artist: Artist): ReactNode => (
+                            <a key={artist.name} href={`https://www.last.fm/music/${artist.name.split(" ").join("+")}`}>
+                                <div className="tag-div">
+                                    <h3>{artist.name}</h3>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                </div>
             </div>
-        )) || <h3>Loading...</h3>}
+        )) || (
+            <div className="loading-div">
+                <h3>Loading...</h3>
+            </div>
+        )}
       </div>
     );
   }

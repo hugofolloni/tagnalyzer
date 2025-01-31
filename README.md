@@ -38,7 +38,9 @@ As a Last.fm user, I want to analyze the tags associated with my most-listened t
 
 ## Screenshots
 
-*Note: Screenshots will be added once the application has a user interface to showcase.*
+![Homepage](public/homepage.png)
+
+![User page](public/userpage.png)
 
 ## Getting Started
 

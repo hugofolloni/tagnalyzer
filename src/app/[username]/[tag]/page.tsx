@@ -2,8 +2,8 @@
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
-import { useEffect, useState } from 'react';
-import { Tag } from '../../../models/tag'
+import { useEffect, useState, ReactNode } from "react";
+import { Album, Tag } from '../../../models/tag'
 import Image from 'next/image';
 import { useSearchParams, useRouter, useParams } from "next/navigation";
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
@@ -40,7 +40,7 @@ export default function TagPage() {
   const findSongsByArtists = async (artists: string[]) => {
     const artistSongs: Song[] = []
 
-    const songsResponse = await fetch('https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=hugofolloni&api_key=db71a72bd8840bf1b346579cc1ed4e71&format=json&period=7day&limit=500')
+    const songsResponse = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${username}&api_key=db71a72bd8840bf1b346579cc1ed4e71&format=json&period=${timeRange}&limit=1000`)
     const songsData = await songsResponse.json()
 
     for(let i = 0; i < songsData.toptracks.track.length; i++){
@@ -52,6 +52,7 @@ export default function TagPage() {
     }
     
     setSongs(artistSongs)
+    console.log(artistSongs)
     findImages(artistSongs[0], artists[0])
   }
 
@@ -115,27 +116,106 @@ export default function TagPage() {
     }
   }, [tag, tags])
 
-  return (
-    <div>
-      {tagInfo && (
-        <div>
-          <h1>{tagInfo.name}</h1>
-          <span>{summary}</span>
-          <p>Count: {tagInfo.count}</p>
-          {images && images.artist && <Image src={images.artist} alt="" width={100} height={100}/>}
-          <p>Artists: {tagInfo.artists.join(', ')}</p>
-          <p>Albums:</p>
-          
-          {tagInfo.albums.map(album => (
-            <Image src={album.image} key={album.name} alt="" width={100} height={100}/>
-          ))}
+  const timeLabels = {
+    'overall': "All time",
+    '7day': 'Last 7 days',
+    '1month': 'Last month',
+    '3month': 'Last 3 months',
+    '6month': 'Last 6 months',
+    '12month': 'Last year'
+}
 
-          {images && images.song && <Image src={images.song} alt="" width={100} height={100}/>}
-          {songs && songs.map(song => (
-            <div className="song-div" key={`${song.title},${song.artist}`}>
-              <span>{song.title}</span>
+  return (
+    <div className='tag-wrapper'>
+      {tagInfo && images && songs && (
+        <div className='tags-div'>
+
+            <div className="tags-profile">
+                <div className="report-headline-border"/>
+                <div className="tags-texts">
+                    <h2>{tagInfo.name}</h2>
+                    <h4>{tagInfo.count} scrobbles</h4>
+                    <h5>{timeLabels[timeRange as keyof typeof timeLabels] || 'All time'}</h5>
+                    <span>{summary}</span>
+                </div>
             </div>
-          ))}
+
+            <div className="most-listened-div">
+              <div className="tag-artists">
+                    <h2>artists</h2>
+                    { images.artist && (
+                        <a href={`https://www.last.fm/music/${tagInfo.artists[0].split(" ").join("+")}`}>
+                            <div className="main-artist">
+                                <Image src={images.artist} className='main-artist-img' alt='main tag image' width={1000} height={1000}/>
+                                <div className="shadow"/>
+                                <h3>{tagInfo.artists[0]}</h3>
+                                <span className="identifier" style={{backgroundColor: "#FFCACE"}}>Top artist</span>
+                            </div>                            
+                        </a>
+                    )}
+
+                    { tagInfo.artists.slice(1, Math.min(50, tagInfo.artists.length)).map((artist: string): ReactNode => (
+                        <a key={artist} href={`https://www.last.fm/music/${artist.split(" ").join("+")}`}>
+                            <div className="tag-div">
+                                <h3>{artist}</h3>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+
+                <div className="tag-albums">
+                    <h2>albums</h2>
+
+                    <a href={`https://www.last.fm/music/${tagInfo.albums[0].artist.split(" ").join("+")}/${tagInfo.albums[0].name.split(" ").join("+")}`}>
+                        <div className="main-album">
+                            <Image src={tagInfo.albums[0].image} className='main-album-img' alt='main album image' width={1000} height={1000}/>
+                            <div className="shadow"/>
+                            <h3>{tagInfo.albums[0].name}</h3>
+                            <span className='image-add-info'>{tagInfo.albums[0].artist}</span>
+                            <span className="identifier" style={{backgroundColor: "#50F0B5"}}>Top album</span>
+                        </div>                            
+                    </a>
+                              
+                    { tagInfo.albums.slice(1, Math.min(50, tagInfo.albums.length)).map((album: Album): ReactNode => (
+                      <a key={album.name} href={`https://www.last.fm/music/${album.artist.split(" ").join("+")}/${album.name.split(" ").join("+")}`}>
+                          <div className="tag-div">
+                              <h3>{album.name}</h3>
+                              <span>{album.artist}</span>
+                          </div>
+                      </a>
+                  ))}
+
+              </div>
+
+              <div className="tag-songs">
+                  <h2>songs</h2>
+                  { images.song && (
+                      <a href={`https://www.last.fm/music/${songs[0].artist.split(" ").join("+")}/_/${songs[0].title.split(" ").join("+")}`}>
+                          <div className="main-artist">
+                              <Image src={images.song} className='main-song-img' alt='main song image' width={1000} height={1000}/>
+                              <div className="shadow"/>
+                              <h3>{songs[0].title}</h3>
+                              <span className='image-add-info'>{songs[0].artist}</span>
+                              <span className="identifier" style={{backgroundColor: "#469DF8"}}>Top song</span>
+                          </div>                            
+                      </a>
+                  )}
+
+                  { songs.slice(1, Math.min(50, songs.length)).map((song: Song): ReactNode => (
+                      <a key={song.title} href={`https://www.last.fm/music/${song.artist.split(" ").join("+")}/_/${song.title.split(" ").join("+")}`}>
+                          <div className="tag-div">
+                              <h3>{song.title}</h3>
+                              <span>{song.artist}</span>
+                          </div>
+                      </a>
+                  ))}
+
+              </div>
+            </div>
+        </div>
+      ) || (
+        <div className="loading-div">
+            <h3>Loading...</h3>
         </div>
       )}
     </div>

@@ -55,6 +55,188 @@ $card-background: #181818;
   text-decoration: underline;
 }
 
+@mixin page-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: 150vw;
+  margin-left: -22%;
+  position: relative;
+
+  .report-headline-border {
+    @include lines-border();
+  }
+  
+  .profile-pic {
+    border-radius: 50%;
+    width: 180px;
+    height: 180px;
+    margin-right: 5%;
+  }
+
+  .tags-texts, .user-texts{
+    @include flex-column();
+
+    h2 {
+      font-weight: 700;
+      font-size: 72px;
+      line-height: 100px;
+    }
+
+    h4 {
+      font-weight: 700;
+      font-size: 35px;
+      line-height: 50px;
+    }
+
+    h5 {
+      font-weight: 700;
+      font-size: 28px;
+      line-height: 40px;
+      margin-bottom: 10px;
+    }
+
+    span {
+      font-weight: 600;
+      line-height: 25px;
+    }
+
+  }
+}
+
+@mixin lines-border {
+  background: url('https://www.last.fm/static/images/listening-report/v3/bg-lines.73682e46b8be.svg');
+  height: 40px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+@mixin showcase-columns {
+  display: flex;
+  flex-direction: row;
+  margin-top: 5%;
+  justify-content: space-between;
+
+  h2 {
+    @include text-decorate();
+    margin-bottom: 20px;
+  }
+
+  .tags, .artists {
+    width: 45%;
+    @include listing-tags();
+  }
+
+  .tag-artists, .tag-songs, .tag-albums {
+    width: 32%;
+    @include listing-tags();
+  }
+}
+
+@mixin listing-tags {
+  .main-tag, .main-artist, .main-song, .main-album {
+    @include flex-column();
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    position: relative;
+    align-items: flex-start;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+    transition: 0.3s ease all;
+    cursor: pointer;
+    &:hover {
+      transform: scale(1.01);
+    }
+
+    h3 {
+      display: flex;
+      align-items: center;
+      z-index: 2;
+      font-size: 32px;
+      padding: 40px;
+      width: 100%;
+      height: 100px;
+      font-weight: 700;
+    }
+    
+    .main-tag-img, .main-artist-img, .main-song-img, .main-album-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; 
+      position: absolute;
+      z-index: 0;
+    }
+
+    .shadow {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; 
+      position: absolute;
+      z-index: 1;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 1) 100%);
+    }
+
+    .identifier {
+      @include flex-center();
+      width: 100px;
+      height: 40px;
+      position: absolute;
+      bottom: 12vh;
+      left: 5%;
+      background-color: $purple-card;
+      color: $black;
+      z-index: 2;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .main-tag {
+      position: absolute;
+      z-index: 2;
+      bottom: 5vh;
+      left: 80%;
+    }
+
+    .image-add-info {
+      position: absolute;
+      top: 5%;
+      right: 5%;
+      font-size: 21px;
+      text-shadow: 
+      -2px -2px 0 black,  
+       2px -2px 0 black,
+      -2px  2px 0 black,
+       2px  2px 0 black; /* Creates an outline effect */
+    }
+  }
+
+  .tag-div {
+    @include clipping();
+    width: 100%;
+    padding: 30px;
+    margin-bottom: 5px;
+    background-color: $card-background;
+    transition: 0.3s ease all;
+    cursor: pointer;
+    &:hover {
+      transform: scale(1.03);
+    }
+
+    h3 {
+      font-size: 21px;
+    }
+
+    span {
+      margin: 10px;
+      font-size: 15px;
+    }
+  }
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -269,148 +451,45 @@ h3, a {
     @include flex-center();
   }
 
-  .tags-div {
+  .user-div {
     @include flex-column(); 
 
     .user-profile {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-start;
+      @include page-header();
       background-color: $salmon;
       color: $card-background;
-      width: 100vw;
-      margin-left: -20%;
       padding: calc(5% + 40px) 20% 5% 20%;
-      position: relative;
-      
-      .report-headline-border {
-        background: url('https://www.last.fm/static/images/listening-report/v3/bg-lines.73682e46b8be.svg');
-        height: 40px;
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 100%;
-      }
-
-      .profile-pic {
-        border-radius: 50%;
-        width: 180px;
-        height: 180px;
-        margin-right: 5%;
-      }
-      
-      .user-texts {
-        @include flex-column();
-
-        h2 {
-          font-weight: 700;
-          font-size: 72px;
-          line-height: 100px;
-        }
-
-        span {
-          font-weight: 600;
-          font-family: 45px;
-          line-height: 25px;
-        }
-      }
+    
     }
 
     .most-listened-div {
-      display: flex;
-      flex-direction: row;
-      margin-top: 5%;
-      justify-content: space-between;
-
-      h2 {
-        @include text-decorate();
-        margin-bottom: 20px;
-      }
-
-      .tags, .artists {
-        width: 45%;
-    
-        .main-tag, .main-artist {
-          @include flex-column();
-          width: 100%;
-          aspect-ratio: 1 / 1;
-          overflow: hidden;
-          position: relative;
-          align-items: flex-start;
-          justify-content: flex-end;
-          margin-bottom: 10px;
-          transition: 0.3s ease all;
-          cursor: pointer;
-          &:hover {
-            transform: scale(1.01);
-          }
-
-          h3 {
-            display: flex;
-            align-items: center;
-            z-index: 2;
-            font-size: 32px;
-            padding: 40px;
-            width: 100%;
-            height: 100px;
-            text-decoration: none;
-            color: $white;
-            font-weight: 700;
-          }
-          
-          .main-tag-img, .main-artist-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-            position: absolute;
-            z-index: 0;
-          }
-
-          .shadow {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-            position: absolute;
-            z-index: 1;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 1) 100%);
-          }
-
-          .identifier {
-            @include flex-center();
-            width: 100px;
-            height: 40px;
-            position: absolute;
-            bottom: 10vh;
-            left: 5%;
-            background-color: $purple-card;
-            color: $black;
-            z-index: 2;
-            font-size: 18px;
-            font-weight: 600;
-          }
-
-          .main-tag {
-            position: absolute;
-            z-index: 2;
-            bottom: 3vh;
-            left: 80%;
-          }
-        }
-
-        .tag-div {
-          @include clipping();
-          width: 100%;
-          padding: 30px;
-          margin-bottom: 5px;
-          background-color: $card-background;
-          transition: 0.3s ease all;
-          cursor: pointer;
-          &:hover {
-            transform: scale(1.03);
-          }
-        }
-      }  
+      @include showcase-columns();
     }
   }
+}
+
+.tag-wrapper {
+  @include wrappers();
+  padding-top: 0%;
+
+  .loading-div{
+    @include flex-center();
+  }
+
+  .tag-div {
+    @include flex-column();
+  }
+
+  .tags-profile {
+    @include page-header();
+    background-color: $purple-card;
+    color: $card-background;
+    padding: 5% 20%;
+
+  }
+
+  .most-listened-div {
+    @include showcase-columns();
+  }
+
 }

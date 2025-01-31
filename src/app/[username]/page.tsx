@@ -83,11 +83,6 @@ export default function UserPage() {
             
             await Promise.all(tagPromises);
             
-            // const tagsResponse = Object.values(tagList).sort((a, b) => b.count - a.count);
-
-            // console.log(tagsResponse)
-            // console.log(sortTagsByArtistCount(artistList, Object.values(tagList).sort((a, b) => b.count - a.count)))
-
             const tagsResponse = sortTagsByArtistCount(artistList, Object.values(tagList).sort((a, b) => b.count - a.count));
 
             getArtistInfos(artistList[0].name, tagsResponse[0].artists.slice(0, 3))
@@ -103,7 +98,7 @@ export default function UserPage() {
     const getTopAlbumsPerTag = async (tagList: Tag[]) => {
         const tagResponseList: Tag[] = []
 
-        const albumResponse = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=hugofolloni&api_key=db71a72bd8840bf1b346579cc1ed4e71&format=json&limit=700&period=${timeRange}`)
+        const albumResponse = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=${username}&api_key=db71a72bd8840bf1b346579cc1ed4e71&format=json&limit=700&period=${timeRange}`)
         const albumData = await albumResponse.json();
 
         const albumList: Album[] = []
@@ -183,10 +178,8 @@ export default function UserPage() {
     }
 
     const sortTagsByArtistCount = (artists: Artist[], tags: Tag[]) => {
-        // Create a map for quick access to artist count
         const artistMap = new Map(artists.map(artist => [artist.name, artist.count]));
       
-        // Sort the artists in each tag based on their count
         return tags.map(tag => ({
           ...tag,
           artists: [...tag.artists].sort((a, b) => 
@@ -214,7 +207,7 @@ export default function UserPage() {
     return (
       <div className="user-wrapper">
         {(tags.length > 0 && userInfo && (
-            <div className="tags-div">
+            <div className="user-div">
                 <div className="user-profile">
                     <div className="report-headline-border"/>
                     <Image src={userInfo.photo} className="profile-pic" alt='Profile pic' width={1000} height={1000} />
@@ -233,7 +226,7 @@ export default function UserPage() {
                                 <Image src={images.tag.photo} className='main-tag-img' alt='main tag image' width={1000} height={1000}/>
                                 <div className="shadow"/>
                                 <h3>{tags[0].name}</h3>
-                                <span className="identifier" style={{backgroundColor: "#469DF8"}}>Top tag</span>
+                                <span className="identifier" >Top tag</span>
                             </div>
                         )}
 
@@ -252,7 +245,7 @@ export default function UserPage() {
                                     <Image src={images.artist.photo} className='main-artist-img' alt='main tag image' width={1000} height={1000}/>
                                     <div className="shadow"/>
                                     <h3>{artists[0].name}</h3>
-                                    <span className="identifier">Top artist</span>
+                                    <span className="identifier" style={{backgroundColor: "#469DF8"}}>Top artist</span>
                                     <span className="main-tag">{artists[0].tags[0]}</span>
                                 </div>                            
                             </a>

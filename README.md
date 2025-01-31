@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# tagnalyzer
+
+A web application that provides Last.fm users with detailed insights into their listening habits by analyzing the tags associated with their favorite artists. Users can explore their most-listened tags and discover information about, including the most listened tracks, albums and artists in the scope of that tag.
+
+## Motivation
+
+The native report that Last.fm provides can be quite limited and doesn't display detailed information about the tags in tracks. This limitation makes it difficult to explore insights about genres or discover new artists based on specific tag-based trends. 
+
+I started this project because I wanted to know which artists from a particular genre were my most listened to, but Last.fm didn't offer that functionality. Since I couldn't find the information I wanted, I decided to build a tool that could do it myself. Tagnalyzer is designed to provide users with a richer and more customizable way to analyze their music preferences based on track tags.
+
+## Table of Contents
+
+- [Motivation](#motivation)
+- [Technologies Used](#technologies-used)
+- [User Story](#user-story)
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Getting Started](#getting-started)
+- [License](#license)
+
+## Technologies Used
+
+- **Next.js**: A React framework for building server-side rendered applications.
+- **TypeScript**: A statically typed programming language that builds on JavaScript.
+- **Sass**: A CSS preprocessor that adds power and elegance to the basic language.
+- **Redux**: A predictable state container for JavaScript apps.
+- **Last.fm API**: Provides access to user listening data and associated tags.
+- **Spotify API**: Used to retrieve images for artists, albums and songs.
+
+## User Story
+
+As a Last.fm user, I want to analyze the tags associated with my most-listened tracks, artists, and albums so that I can gain insights into my musical preferences.
+
+## Features
+
+- **User Page**: Displays the user's most-listened tags and artists, providing a personalized overview of listening habits.
+- **Tag Page**: Offers detailed information about a specific tag, including the most listened artists, songs, and albums associated with an Last.fm user.
+
+## Screenshots
+
+*Note: Screenshots will be added once the application has a user interface to showcase.*
 
 ## Getting Started
 
-First, run the development server:
+To set up and run the tagnalyzer application locally, follow these steps:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Clone the Repository**:
+   
+   ```bash
+   git clone https://github.com/hugofolloni/tagnalyzer.git
+   cd tagnalyzer
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install Dependencies**:
+   
+   ```bash
+   npm install
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Run the Development Server**:
+   
+   ```bash
+   npm run dev
+   ```
+   
+   The application will be accessible at [http://localhost:3000](http://localhost:3000).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## License
 
-To learn more about Next.js, take a look at the following resources:
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

@@ -23,7 +23,8 @@ export default function RootLayout({
         <Provider store={store}>
           <Header/>
           {children}
-          </Provider>
+          <span className="credits">Created by <a href="https://hugofolloni.com">@hugofolloni</a></span>
+        </Provider>
       </body>
     </html>
   );

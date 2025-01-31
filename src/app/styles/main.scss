@@ -1,18 +1,15 @@
-$black: #121212;  // Dark main background  
-$white: #ffffff;        // White text  
-$primary-color: #D51007;     // Last.fm red  
+$black: #121212;
+$white: #ffffff;      
+$primary-color: #D51007;   
 $dark-primary: darken($primary-color, 10%);  
 $light-primary: lighten($primary-color, 20%);  
-$dark-gradient: #000000;      // Deep black for contrast  
+$dark-gradient: #000000;  
 
-// New Extracted Colors
-$salmon: #FFCACE;      // Soft pinkish red (used in the header)
-$purple-card: #A56EFF; // Purple for artist stats  
-$green-card: #50F0B5;  // Green for album stats  
-$blue-card: #4285F4;   // Blue for track stats  
-       // Soft red for links and interactive elements  
-$card-background: #181818;  
-      // Soft red for links and interactive elements  
+$salmon: #FFCACE;
+$purple-card: #A56EFF;
+$green-card: #50F0B5;
+$blue-card: #4285F4;
+$card-background: #181818;
 
 @mixin flex-center {
   display: flex;
@@ -44,6 +41,7 @@ $card-background: #181818;
 @mixin wrappers {
   width: 100vw;
   padding: 7% 15%;
+  min-height: calc(100vh - 230px);
 }
 
 @mixin clipping {
@@ -355,9 +353,16 @@ h3, a {
   }
 }
 
+.credits {
+  position: relative;
+  width: 200px;
+  margin-left: calc(50% - 100px);
+  opacity: 0.5;
+  margin-bottom: 100vh;
+}
+
 .home-wrapper{
   @include wrappers();
-  height: calc(100vh - 180px);
   position: relative;
   
   .title-div {

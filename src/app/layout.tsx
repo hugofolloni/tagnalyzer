@@ -1,16 +1,15 @@
-'use client';
-
 import { Barlow_Semi_Condensed } from 'next/font/google';
 import './styles/main.scss';
-import { Provider } from 'react-redux';
-import { store } from '../store/store';
-import Header from './header';
+import ClientLayout from './ClientLayout';
+import { siteMetadata } from './metadata';
 
 const barlow = Barlow_Semi_Condensed({
   subsets: ['latin'],
-  weight: ['400', '700'], // Adapte conforme necessário
-  variable: '--font-barlow', // Define uma variável CSS para facilitar o uso
+  weight: ['400', '700'],
+  variable: '--font-barlow',
 });
+
+export const metadata = siteMetadata;
 
 export default function RootLayout({
   children,
@@ -20,11 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={barlow.variable}>
       <body>
-        <Provider store={store}>
-          <Header/>
-          {children}
-          <span className="credits">Created by <a href="https://hugofolloni.com">@hugofolloni</a></span>
-        </Provider>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

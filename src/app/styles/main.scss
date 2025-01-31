@@ -209,14 +209,14 @@ h3, a {
     .select-underline {
       &:before {
         @include underline-create();
-        margin-left: calc(57%);
+        margin-left: calc(65% - 60px);
         width: 20%;
         background: $white;
       }
     
       &:after {
         @include underline-create();
-        margin-left: calc(57%);
+        margin-left: calc(65% - 60px);
         width: 20%;
         background: $primary-color;
         transform: scaleX(0);

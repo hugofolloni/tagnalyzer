@@ -3,7 +3,7 @@
 import { useEffect, useState, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, useParams } from "next/navigation";
 import { Tag, Artist, Album, UserInfo, ArtistInfoResponse } from '../../models/tag'
 import Image from 'next/image';
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
@@ -12,7 +12,7 @@ import { setArtists } from "@/store/artistSlice";
 import { setImages } from "@/store/imageSlice";
 
 
-export default function UserPage({ params }: { params: { username: string } }) {
+export default function UserPage() {
     const dispatch = useDispatch();
     const router = useRouter();
   
@@ -22,7 +22,8 @@ export default function UserPage({ params }: { params: { username: string } }) {
 
     const searchParams = useSearchParams();
     const timeRange = searchParams.get("timeRange") || "overall";
-    const { username } = params;
+    const params = useParams() as { username?: string };
+    const username = params.username ?? ""; 
     const [userInfo, setUserInfo] = useState<UserInfo>()
     const [iterations, setIterations] = useState<number>();
     
@@ -82,10 +83,14 @@ export default function UserPage({ params }: { params: { username: string } }) {
             
             await Promise.all(tagPromises);
             
-            const tagsResponse = Object.values(tagList).sort((a, b) => b.count - a.count);
-            
-            getArtistInfos(artistList.slice(0, 3), tagsResponse[0].artists.slice(0, 3))
-            console.log(tagsResponse)
+            // const tagsResponse = Object.values(tagList).sort((a, b) => b.count - a.count);
+
+            // console.log(tagsResponse)
+            // console.log(sortTagsByArtistCount(artistList, Object.values(tagList).sort((a, b) => b.count - a.count)))
+
+            const tagsResponse = sortTagsByArtistCount(artistList, Object.values(tagList).sort((a, b) => b.count - a.count));
+
+            getArtistInfos(artistList[0].name, tagsResponse[0].artists.slice(0, 3))
             
             setIterations(countIterations);
             getTopAlbumsPerTag(tagsResponse);            
@@ -117,15 +122,13 @@ export default function UserPage({ params }: { params: { username: string } }) {
 
     }
     
-    const getArtistInfos = async (artists: Artist[], mainTagArtists: string[]) => {
+    const getArtistInfos = async (artist: string, mainTagArtists: string[]) => {
 
-        const artistList: string[] = [artists[0].name]
         const tagArtistList: string[] = []
 
         for(let i = 0; i < mainTagArtists.length; i++){
             tagArtistList.push(mainTagArtists[i].toLowerCase())
         }
-        console.log(tagArtistList, artistList)
 
         const response: ArtistInfoResponse = {tag: null, artist: null}
 
@@ -134,12 +137,11 @@ export default function UserPage({ params }: { params: { username: string } }) {
             process.env.NEXT_PUBLIC_SPOTIFY_SECRET!
         );
 
-        const items = await api.search(`${artistList.join(`,`)},${tagArtistList.join(`,`)}`, ["artist"]);
-        console.log(items)
+        const items = await api.search(`${artist},${tagArtistList.join(`,`)}`, ["artist"], 'US', 50);
 
         for(let i = 0; i < items.artists.items.length; i++){
             const item = items.artists.items[i];
-            if(item.name.toLowerCase() === artists[0].name.toLowerCase()){
+            if(item.name.toLowerCase() === artist.toLowerCase()){
                 response.artist = {photo: item.images[0].url, name: item.name}
             }
 
@@ -147,20 +149,54 @@ export default function UserPage({ params }: { params: { username: string } }) {
                 response.tag = {photo: item.images[0].url, name: item.name}
             }
         }
+
         if(!response.artist){
-            response.artist = {photo: 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png', name: artists[0].name}
+            console.log('Retrying artist')
+            const artistResponse = await api.search(artist, ["artist"], 'US', 50);
+            for(let i = 0; i < artistResponse.artists.items.length; i++){
+                const item = artistResponse.artists.items[i];
+                if(item.name.toLowerCase() === artists[0].name.toLowerCase()){
+                    response.artist = {photo: item.images[0].url, name: item.name}
+                }
+            }
+
+            if(!response.artist){
+                response.artist = {photo: 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png', name: artists[0].name}
+            }
         }
 
         if(!response.tag){
-            response.tag = {photo: 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png', name: mainTagArtists[0]}
+            console.log('Retrying tag')
+            const tagResponse = await api.search(`${tagArtistList.join(',')}}`, ["artist"], 'US', 50);
+            for(let i = 0; i < tagResponse.artists.items.length; i++){
+                const item = tagResponse.artists.items[i];
+                if((tagArtistList.indexOf(item.name.toLowerCase()) !== -1 && !response.tag) || (response.tag && tagArtistList.indexOf(item.name.toLowerCase()) !== -1 && tagArtistList.indexOf(item.name.toLowerCase()) < tagArtistList.indexOf(response.tag.name.toLowerCase()))){
+                    response.tag = {photo: item.images[0].url, name: item.name}
+                }
+            }
+            if(!response.tag){
+                response.tag = {photo: 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png', name: mainTagArtists[0]}
+            }
         }
 
-
-        console.log(response)
         dispatch(setImages(response))
     }
+
+    const sortTagsByArtistCount = (artists: Artist[], tags: Tag[]) => {
+        // Create a map for quick access to artist count
+        const artistMap = new Map(artists.map(artist => [artist.name, artist.count]));
+      
+        // Sort the artists in each tag based on their count
+        return tags.map(tag => ({
+          ...tag,
+          artists: [...tag.artists].sort((a, b) => 
+            (artistMap.get(b) ?? 0) - (artistMap.get(a) ?? 0)
+          ),
+        }));
+      }
     
     useEffect(() => {
+        if (!username) return;
         getArtistTags();
         getUserInfos();
     }, [])
@@ -184,7 +220,7 @@ export default function UserPage({ params }: { params: { username: string } }) {
                     <Image src={userInfo.photo} className="profile-pic" alt='Profile pic' width={1000} height={1000} />
                     <div className="user-texts">
                         <h2>{userInfo.username}</h2>
-                        <span>{timeLabels[timeRange as keyof typeof timeLabels]}</span>
+                        <span>{timeLabels[timeRange as keyof typeof timeLabels] || 'All time'}</span>
                         {iterations && <span>{iterations} most listened artists</span>}
                     </div>
                 </div>

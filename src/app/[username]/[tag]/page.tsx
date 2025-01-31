@@ -74,25 +74,32 @@ export default function TagPage() {
 
       const apiImages:Images = {song: undefined, artist: undefined}
 
-      const songData = await api.search(`${song.title},${song.artist}}`, ["track"], 'US', 10);
-
-      for(let i = 0; i < songData.tracks.items.length; i++){
-        const item = songData.tracks.items[i];
-        if(item.artists[0].name.toLowerCase() === song.artist.toLowerCase() && item.name.toLowerCase() === song.title.toLowerCase()){
-          apiImages.song = item.album.images[0].url;
-          if (item.album.name.toLowerCase() === tagInfo?.albums[0].name.toLowerCase() && item.artists[0].name.toLowerCase() === tagInfo.albums[0].artist.toLowerCase()) setMainAlbumImage(item.album.images[0].url);
-          break;
-        }
+      try {
+          const songData = await api.search(`${song.title},${song.artist}}`, ["track"], 'US', 10);
+    
+          for(let i = 0; i < songData.tracks.items.length; i++){
+            const item = songData.tracks.items[i];
+            if(item.artists[0].name.toLowerCase() === song.artist.toLowerCase() && item.name.toLowerCase() === song.title.toLowerCase()){
+              apiImages.song = item.album.images[0].url;
+              if (item.album.name.toLowerCase() === tagInfo?.albums[0].name.toLowerCase() && item.artists[0].name.toLowerCase() === tagInfo.albums[0].artist.toLowerCase()) setMainAlbumImage(item.album.images[0].url);
+              break;
+            }
+          }
+    
+          const artistData = await api.search(artist, ["artist"], "US", 10); 
+          
+          for(let i = 0; i < artistData.artists.items.length; i++){
+            const item = artistData.artists.items[i];
+            if(item.name.toLowerCase() === artist.toLowerCase()){
+              apiImages.artist = item.images[0].url;
+              break;
+            }
+          }
       }
-
-      const artistData = await api.search(artist, ["artist"], "US", 10); 
-      
-      for(let i = 0; i < artistData.artists.items.length; i++){
-        const item = artistData.artists.items[i];
-        if(item.name.toLowerCase() === artist.toLowerCase()){
-          apiImages.artist = item.images[0].url;
-          break;
-        }
+      catch(e) {
+        console.log(e)
+        if(!apiImages.artist) apiImages.artist = 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png'
+        if(!apiImages.song) apiImages.song = 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png'
       }
 
       setImages(apiImages)
@@ -201,7 +208,7 @@ export default function TagPage() {
                               <span className="identifier" style={{backgroundColor: "#469DF8"}}>Top song</span>
                           </div>                            
                       </a>
-                  )}
+                   )} 
 
                   { songs.slice(1, Math.min(50, songs.length)).map((song: Song): ReactNode => (
                       <a key={song.title} href={`https://www.last.fm/music/${song.artist.split(" ").join("+")}/_/${song.title.split(" ").join("+")}`}>

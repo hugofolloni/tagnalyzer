@@ -64,6 +64,11 @@ $card-background: #181818;
   margin-left: -22%;
   position: relative;
 
+  @media (max-width: 768px) {
+    height: fit-content;
+    padding-top: 50px;
+  }
+
   .report-headline-border {
     @include lines-border();
   }
@@ -73,21 +78,37 @@ $card-background: #181818;
     width: 180px;
     height: 180px;
     margin-right: 5%;
+
+    @media (max-width: 768px) {
+      width: 90px;
+      height: 90px;
+    }
   }
 
   .tags-texts, .user-texts{
     @include flex-column();
+    width: 70vw;
 
     h2 {
       font-weight: 700;
       font-size: 72px;
       line-height: 100px;
+
+          
+      @media (max-width: 768px) {
+        font-size: 32px;
+        line-height: 45px;
+      }
     }
 
     h4 {
       font-weight: 700;
       font-size: 35px;
       line-height: 50px;
+
+      @media (max-width: 768px) {
+        font-size: 24px;
+      }
     }
 
     h5 {
@@ -95,11 +116,21 @@ $card-background: #181818;
       font-size: 28px;
       line-height: 40px;
       margin-bottom: 10px;
+
+      @media (max-width: 768px) {
+        font-size: 18px;
+        margin-bottom: 3px;
+      }
     }
 
     span {
       font-weight: 600;
       line-height: 25px;
+
+      @media (max-width: 768px) {
+        font-size: 12px;
+        line-height: 16px;
+      }
     }
 
   }
@@ -120,6 +151,10 @@ $card-background: #181818;
   margin-top: 5%;
   justify-content: space-between;
 
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+
   h2 {
     @include text-decorate();
     margin-bottom: 20px;
@@ -128,15 +163,28 @@ $card-background: #181818;
   .tags, .artists {
     width: 45%;
     @include listing-tags();
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
   }
 
   .tag-artists, .tag-songs, .tag-albums {
     width: 32%;
     @include listing-tags();
+
+    @media (max-width: 768px) {
+      width: 100%;
+      margin-top: 20px;
+    }
   }
 }
 
 @mixin listing-tags {
+  @media (max-width: 768px) {
+    margin-bottom: 10vh;
+  }
+
   .main-tag, .main-artist, .main-song, .main-album {
     @include flex-column();
     width: 100%;
@@ -145,9 +193,14 @@ $card-background: #181818;
     position: relative;
     align-items: flex-start;
     justify-content: flex-end;
-    margin-bottom: 10px;
     transition: 0.3s ease all;
+    margin-bottom: 50px;
     cursor: pointer;
+ 
+    @media (max-width: 768px) {
+      margin-bottom: 20px;
+    }
+
     &:hover {
       transform: scale(1.01);
     }
@@ -222,6 +275,13 @@ $card-background: #181818;
     background-color: $card-background;
     transition: 0.3s ease all;
     cursor: pointer;
+
+    @media (max-width: 768px){
+      &:nth-child(n+21) {
+        display: none;
+      }
+    }
+
     &:hover {
       transform: scale(1.03);
     }
@@ -288,6 +348,11 @@ h3, a {
       left: 4px;
     }
   }
+
+  @media (max-width: 768px) {
+    @include flex-center();
+    padding: 0;
+  }
 }
 
 .home-wrapper{
@@ -303,7 +368,12 @@ h3, a {
       font-size: 64px;
       font-weight: 700;
       letter-spacing: -3px;
+
+      @media (max-width: 768px) {
+        font-size: 11vw;
+      }
     }
+
   }
 
   .subtitle-div {
@@ -312,6 +382,9 @@ h3, a {
     
     span {
       font-size: 21px;
+      @media (max-width: 768px) {
+        font-size: 4.5vw;
+      }
     }
   }
 
@@ -324,6 +397,12 @@ h3, a {
     margin-top: 5%;
     align-items: center;
 
+    @media (max-width: 768px) {
+      @include flex-column();
+      padding: 0;
+      margin-top: 10vh;
+    }
+
     input {
       width: 50%;
       border: none;
@@ -334,7 +413,12 @@ h3, a {
       height: 50px;
       margin-top: 20px;
       outline: none;
-      
+
+      @media (max-width: 768px) {
+        width: 100%;
+        border-bottom: 1px solid $white;
+      }
+
       &:focus {
         & ~ .underline::after {
           transform: scaleX(1);
@@ -355,6 +439,10 @@ h3, a {
         transition: all 0.3s ease-in-out;
         transform-origin: left;
       }
+
+      @media (max-width: 768px) {
+        display: none;
+      }
     }
 
     select {
@@ -370,6 +458,11 @@ h3, a {
       cursor: pointer;
       position: relative;
       appearance: none; 
+
+      @media (max-width: 768px) {
+        width: 100%;
+        border-bottom: 1px solid $white;
+      }
 
       option {
         background: $card-background;
@@ -405,6 +498,10 @@ h3, a {
         transition: all 0.3s ease-in-out;
         transform-origin: right;
       } 
+
+      @media (max-width: 768px) {
+        display: none;
+      }
     }
 
     .search-button {
@@ -418,12 +515,17 @@ h3, a {
       transition: 0.3s ease;
       margin-top: 20px;
  
-     &:hover{
-      background-color: $white;
-      transform: translate(5px, -5px);
-      color: $primary-color;
+      @media (max-width: 768px) {
+        width: 40vw;
+      }
+
+      &:hover{
+        background-color: $white;
+        transform: translate(5px, -5px);
+        color: $primary-color;
+
+      }
     }
-  }
 
     .search-button-background {
       @include button();
@@ -431,6 +533,12 @@ h3, a {
       z-index: -1;
       top: 20px;
       right: 0;
+
+      @media (max-width: 768px) {
+        width: 40vw;
+        right: 21.5%;
+        top: calc(100% - 50px);
+      }
     }
   }
 
@@ -440,6 +548,12 @@ h3, a {
     right: 20%;
     height: 40vh;
     width: 40vh;
+    @media (max-width: 768px) {
+      z-index: -1;
+      right: -10%;
+      top: 50%;
+      opacity: 0.4;
+    }
   }
 }
 
@@ -476,7 +590,7 @@ h3, a {
     @include flex-center();
   }
 
-  .tag-div {
+  .tags-div {
     @include flex-column();
   }
 

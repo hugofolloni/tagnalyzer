@@ -36,6 +36,7 @@ export default function TagPage() {
   const [summary, setSummary] = useState<string>()
   const [songs, setSongs] = useState<Song[]>([])
   const [images, setImages] = useState<Images>()
+  const [mainAlbumImage, setMainAlbumImage] = useState<string>()
 
   const findSongsByArtists = async (artists: string[]) => {
     const artistSongs: Song[] = []
@@ -79,6 +80,7 @@ export default function TagPage() {
         const item = songData.tracks.items[i];
         if(item.artists[0].name.toLowerCase() === song.artist.toLowerCase() && item.name.toLowerCase() === song.title.toLowerCase()){
           apiImages.song = item.album.images[0].url;
+          if (item.album.name.toLowerCase() === tagInfo?.albums[0].name.toLowerCase() && item.artists[0].name.toLowerCase() === tagInfo.albums[0].artist.toLowerCase()) setMainAlbumImage(item.album.images[0].url);
           break;
         }
       }
@@ -168,7 +170,7 @@ export default function TagPage() {
 
                     <a href={`https://www.last.fm/music/${tagInfo.albums[0].artist.split(" ").join("+")}/${tagInfo.albums[0].name.split(" ").join("+")}`}>
                         <div className="main-album">
-                            <Image src={tagInfo.albums[0].image} className='main-album-img' alt='main album image' width={1000} height={1000}/>
+                            <Image src={mainAlbumImage ? mainAlbumImage : tagInfo.albums[0].image} className='main-album-img' alt='main album image' width={1000} height={1000}/>
                             <div className="shadow"/>
                             <h3>{tagInfo.albums[0].name}</h3>
                             <span className='image-add-info'>{tagInfo.albums[0].artist}</span>

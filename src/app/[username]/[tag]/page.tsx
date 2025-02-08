@@ -53,7 +53,6 @@ export default function TagPage() {
     }
     
     setSongs(artistSongs)
-    console.log(artistSongs)
     findImages(artistSongs[0], artists[0])
   }
 
@@ -96,10 +95,9 @@ export default function TagPage() {
             }
           }
       }
-      catch(e) {
-        console.log(e)
-        if(!apiImages.artist) apiImages.artist = 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png'
-        if(!apiImages.song) apiImages.song = 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png'
+      catch {
+        if(!apiImages.artist) apiImages.artist = 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+        if(!apiImages.song) apiImages.song = 'https://images.unsplash.com/photo-1530288782965-fbad40327074?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
       }
 
       setImages(apiImages)
@@ -118,7 +116,6 @@ export default function TagPage() {
     }
     const selectedTag = tags.find(currentTag => currentTag.name.toLowerCase() === tag.toLowerCase().replaceAll("%20", " "));
     setTagInfo(selectedTag)
-    console.log(selectedTag)
     if(selectedTag) {
       findSongsByArtists(selectedTag.artists)
       findTagSummary(selectedTag.name)

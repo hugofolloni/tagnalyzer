@@ -11,7 +11,6 @@ import { setTags } from "../../store/tagSlice";
 import { setArtists } from "@/store/artistSlice";
 import { setImages } from "@/store/imageSlice";
 
-
 export default function UserPage() {
     const dispatch = useDispatch();
     const router = useRouter();
@@ -120,7 +119,7 @@ export default function UserPage() {
     const getArtistInfos = async (artist: string, mainTagArtists: string[]) => {
 
         const tagArtistList: string[] = []
-
+        
         for(let i = 0; i < mainTagArtists.length; i++){
             tagArtistList.push(mainTagArtists[i].toLowerCase())
         }
@@ -132,36 +131,16 @@ export default function UserPage() {
             process.env.NEXT_PUBLIC_SPOTIFY_SECRET!
         );
 
-        const items = await api.search(`${artist},${tagArtistList.join(`,`)}`, ["artist"], 'US', 50);
-
-        for(let i = 0; i < items.artists.items.length; i++){
-            const item = items.artists.items[i];
-            if(item.name.toLowerCase() === artist.toLowerCase()){
-                response.artist = {photo: item.images[0].url, name: item.name}
-            }
-
-            if((tagArtistList.indexOf(item.name.toLowerCase()) !== -1 && !response.tag) || (response.tag && tagArtistList.indexOf(item.name.toLowerCase()) !== -1 && tagArtistList.indexOf(item.name.toLowerCase()) < tagArtistList.indexOf(response.tag.name.toLowerCase()))){
-                response.tag = {photo: item.images[0].url, name: item.name}
-            }
-        }
-
-        if(!response.artist){
-            console.log('Retrying artist')
-            const artistResponse = await api.search(artist, ["artist"], 'US', 50);
-            for(let i = 0; i < artistResponse.artists.items.length; i++){
+        try {
+            const artistResponse = await api.search(artist, ["artist"], 'US', 50);    
+            for(let i = 0; i < 50; i++){
                 const item = artistResponse.artists.items[i];
-                if(item.name.toLowerCase() === artists[0].name.toLowerCase()){
+                if(item.name.toLowerCase() === artist.toLowerCase()){
                     response.artist = {photo: item.images[0].url, name: item.name}
+                    break;
                 }
             }
 
-            if(!response.artist){
-                response.artist = {photo: 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png', name: artists[0].name}
-            }
-        }
-
-        if(!response.tag){
-            console.log('Retrying tag')
             const tagResponse = await api.search(`${tagArtistList.join(',')}}`, ["artist"], 'US', 50);
             for(let i = 0; i < tagResponse.artists.items.length; i++){
                 const item = tagResponse.artists.items[i];
@@ -169,9 +148,13 @@ export default function UserPage() {
                     response.tag = {photo: item.images[0].url, name: item.name}
                 }
             }
-            if(!response.tag){
-                response.tag = {photo: 'https://lastfm.freetls.fastly.net/i/u/64s/2a96cbd8b46e442fc41c2b86b821562f.png', name: mainTagArtists[0]}
-            }
+
+            if(!response.artist?.photo) response.artist = {photo: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', name: artist}
+            if(!response.tag?.photo) response.tag = {photo: 'https://images.unsplash.com/photo-1530288782965-fbad40327074?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', name: mainTagArtists[0]}
+        }
+        catch {
+            if(!response.artist?.photo) response.artist = {photo: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', name: artist}
+            if(!response.tag?.photo) response.tag = {photo: 'https://images.unsplash.com/photo-1530288782965-fbad40327074?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', name: mainTagArtists[0]}
         }
 
         dispatch(setImages(response))
